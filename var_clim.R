@@ -1,0 +1,28 @@
+##calculating tropical climatological mean ####################################
+
+
+###section 1
+data<-	"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc"	##name of dataset to be used
+var<-	"pr"							##name of variable extracted
+conv<-86400							##unit conversion (1 if NA)
+
+
+###1. Get precipitation data (tropics) ##############
+nc<-open.ncdf(data)
+#define lat indexes for tropics (40S-40N)
+s<-match(nc$dim$lat$vals[floor(nc$dim$lat$vals)==-40],nc$dim$lat$vals) 
+n<-match(nc$dim$lat$vals[ceiling(nc$dim$lat$vals)==40],nc$dim$lat$vals) 
+#get variable data and dimensions for the tropics
+var<-get.var.ncdf(nc, "pr", start=c(1,s,1), count=c(-1,n-s+1,-1))
+lon<-nc$dim$lon$len
+lat<-n-s
+time<-nc$dim$time$len
+yy<-time/12
+var<-var*conv
+
+#get lat indexes 
+nc<-open.ncdf("pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc",readunlim=F)
+s<-match(nc$dim$lat$vals[floor(nc$dim$lat$vals)==-40],nc$dim$lat$vals) ##get index 40S
+n<-match(nc$dim$lat$vals[ceiling(nc$dim$lat$vals)==40],nc$dim$lat$vals) ##index 40N
+close.ncdf(nc)
+

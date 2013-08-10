@@ -1,0 +1,55 @@
+RSYNC_PASSWORD=getdata rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/piControl/Amon/pr/CCSM4 .
+RSYNC_PASSWORD=getdata rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/past1000/Amon/pr/CCSM4 .
+RSYNC_PASSWORD=getdata rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/pr/CCSM4 .
+
+######################
+
+
+RSYNC_PASSWORD=getdata rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rlut/bcc-csm1-1 .
+RSYNC_PASSWORD=getdata rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/tas/bcc-csm1-1 .
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/tas/bcc-csm1-1 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rlut/bcc-csm1-1 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rsut/bcc-csm1-1 .
+
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/tas/MIROC5 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rlut/MIROC5 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rsut/MIROC5 .
+
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/tas/inmcm4 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rlut/inmcm4 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rsut/inmcm4 .
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/tas/HadGEM2-ES .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rlut/HadGEM2-ES .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rsut/HadGEM2-ES .
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/tas/NorESM1-M .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rlut/NorESM1-M .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/rcp45/Amon/rsut/NorESM1-M .
+
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/tas/bcc-csm1-1 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rlut/bcc-csm1-1 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rsut/bcc-csm1-1 .
+
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/tas/MIROC5 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rlut/MIROC5 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rsut/MIROC5 .
+
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/tas/inmcm4 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rlut/inmcm4 .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rsut/inmcm4 .
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/tas/HadGEM2-ES .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rlut/HadGEM2-ES .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rsut/HadGEM2-ES .
+
+
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/tas/NorESM1-M .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rlut/NorESM1-M .
+rsync -vrlpt cmip5user@atmos.ethz.ch::cmip5/historical/Amon/rsut/NorESM1-M .
