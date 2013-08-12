@@ -3,23 +3,25 @@
 
 ###section 1
 data<-	"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc" ##name of dataset to be used
-var<-	"pr"						##name of variable extracted
-conv<-86400						##unit conversion (1 if NA)
+var<-	"pr"		##name of variable extracted
+conv<-86400		##unit conversion (1 if NA)
 	#precipitation mm/day: 86400
 
 #Break dataset into spatial (lon) sections
-set<- 3							##number of sections
-n<- 1							##section being used
+set<- 3			##number of sections
+n<- 1			##section being used
 
-x.min<- 0						##start lon
-x.max<-	96						##end lon
+x.min<- 0		##start lon
+x.max<-	96		##end lon
 	#for lon 288: 0-96,97-192, 193-288
 
 ###section 2
+ncname<-"CCSM4_pr_piC_clim1.nc"
+
 varname<- "clim250_500"
 units<- "mm/day"
 longname<-"Climatology 250-500"
-ncname<-"CCSM4_pr_piC_1.nc"
+
 
 ###1. Get precipitation data (tropics) ##############
 
@@ -46,7 +48,6 @@ mm<-gl(12, 1, time)
 #create an array to hold monthly means
 clim<-array(NA,dim=c(lon,lat,12)) 
 #change variable dims and loop to calculate means for each month
-dim(var)<-c(lon,lat,time)
 
 for (i in 1:lon)
 {
@@ -60,7 +61,7 @@ clim[i,j,]<-vaggregate(var[i,j,],mm,mean,na.rm=T)
 ##Define dimensions
 x <- dim.def.ncdf( "lon1", "degrees_east", nc$dim$lon$vals[x.min:x.max])
 y <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[lat.min:lat.max])
-t <- dim.def.ncdf( "time", "timesteps", 1:12612)
+t <- dim.def.ncdf( "time", "timesteps", 1:12612,unlim=TRUE)
 
 ##define variables
 climvar<-var.def.ncdf(varname,units,list(x,y,t),NA,longname=longname)
@@ -69,9 +70,9 @@ climvar<-var.def.ncdf(varname,units,list(x,y,t),NA,longname=longname)
 nc<-create.ncdf(ncname, climvar)
 
 ##add data to netCDF file
-put.var.ncdf(nc,varname,clim)
+put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
 
 
-close.ncdf(mmeannc)
+close.ncdf(nc)
 
 

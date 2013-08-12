@@ -1,19 +1,27 @@
-##calculating tropical climatological mean ####################################
+##calculating tropical climatological mean SECTION 1 ####################################
 
 
 ###section 1
 data<-	"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc" ##name of dataset to be used
-var<-	"pr"						##name of variable extracted
-conv<-86400						##unit conversion (1 if NA)
+###section 2
+varname<- "clim250_500"
+longname<-"Climatology 250-500"
+
+
+var<-	"pr"		##name of variable extracted
+conv<-86400		##unit conversion (1 if NA)
 	#precipitation mm/day: 86400
 
 #Break dataset into spatial (lon) sections
-set<- 3							##number of sections
-n<- 1							##section being used
+set<- 3			##number of sections
+n<- 2			##section being used
 
-x.min<- 97						##start lon
-x.max<-	192						##end lon
+x.min<- 97		##start lon
+x.max<-	192		##end lon
 	#for lon 288: 0-96,97-192, 193-288
+
+ncname<-"CCSM4_pr_piC_clim2.nc"
+units<- "mm/day"
 
 
 
@@ -32,6 +40,8 @@ yy<-time/12
 
 #get variable data and dimensions for the tropics
 var<-get.var.ncdf(nc, "pr", start=c(1+((n-1)*lon),lat.min,1), count=c(lon,lat,-1))
+close.ncdf(nc)
+
 #convert to mm/day
 var<-var*conv
 
@@ -40,7 +50,6 @@ mm<-gl(12, 1, time)
 #create an array to hold monthly means
 clim<-array(NA,dim=c(lon,lat,12)) 
 #change variable dims and loop to calculate means for each month
-dim(var)<-c(lon,lat,time)
 
 for (i in 1:lon)
 {
@@ -50,6 +59,22 @@ clim[i,j,]<-vaggregate(var[i,j,],mm,mean,na.rm=T)
 }}
 
 
+###2. Create ncetCDF file ################################
+##Define dimensions
+x <- dim.def.ncdf( "lon2", "degrees_east", nc$dim$lon$vals[x.min:x.max])
+y <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[lat.min:lat.max])
+t <- dim.def.ncdf( "time", "timesteps", 1:12612,unlim=TRUE)
 
+##define variables
+climvar<-var.def.ncdf(varname,units,list(x,y,t),NA,longname=longname)
+
+##create netCDF file
+nc<-create.ncdf(ncname, climvar)
+
+##add data to netCDF file
+put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
+
+
+close.ncdf(nc)
 
 
