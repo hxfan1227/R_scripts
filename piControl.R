@@ -20,6 +20,8 @@ library(clim.pact) #masks mod, num2str, map
 library(R.methodsS3)
 library(R.oo) #masks getDescription, getTitle, attach, getClasses, getMethods, attach, detach, gc, load, save
 library(R.utils) #masks insert, timestamp, cat, commandArgs, getOption, inherits, isOpen, parse, warnings
+library(plyr) #needed for vaggregate
+library(reshape) #possibly needed??? masks rename, round_any
 
 
 

@@ -90,7 +90,7 @@ colnames(nc.1)<-yr
 y<-gl(yy,mm)
 
 library(plyr) #needed for vaggregate
-library(reshape) #possibly needed???
+library(reshape) #possibly needed??? rename, round_any
 
 ##loop taking mean for each lat*lon grid 
 ncmean<-array(0,dim=c(lat*lon,yy))
