@@ -1,19 +1,35 @@
+#### Calculate final climatology, anomalies ###################
 
 
-
-ncname<-"CCSM4_pr_piC_clim1.nc"	##name of netCDF file
+ncname<-"CCSM4_pr_piC_clim1.nc"	##name of netCDF file with clims
 units<- "mm/day"		##units of variable
 varname<-"climatology1"		##name of variable created
-n<-2				##number of timesets
+nt<-2				##number of timesets
 
-##get climatological mean over whole time period
+data<-"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc"	##dataset name
+vb<-"pr"			##variable name
+conv<-86400		##unit conversion (1 if NA)
+	#precipitation mm/day: 86400
+
+#Break dataset into spatial (lon) sections
+set<- 3			##number of sections
+n<- 1			##section being used
+
+x.min<- 0		##start lon
+x.max<-	96		##end lon
+	#for lon 288: 0-96,97-192, 193-288
+
+
+
+
+### CLIMATOLOGICAL MEAN #########
 nc<-open.ncdf(ncname,write=T)
 #create 4D array to hold clim means for each timeset
-means<-array(NA,dim=c(nc$dim$lon1$len, nc$dim$lat$len,12,n))
+means<-array(NA,dim=c(nc$dim$lon1$len, nc$dim$lat$len,12,nt))
 #create array to hold final climatology
 clim<-array(NA,dim=c(nc$dim$lon1$len, nc$dim$lat$len,12))
 #generate levels for each month in each timeset
-gg<-gl(12, 1, 12*n)
+gg<-gl(12, 1, 12*nt)
 #loop to put data in means array, then take mean over all timesets (4th dimension)
 for (i in 1:n)
 {
@@ -47,49 +63,75 @@ rm(list = ls())
 
 
 
+######### ANOMALIES ########
+nc<-open.ncdf(data)
+#define lat indexes for tropics (40S-40N)
+lat.min<-match(nc$dim$lat$vals[round(nc$dim$lat$vals)==-40],nc$dim$lat$vals) 
+lat.max<-match(nc$dim$lat$vals[round(nc$dim$lat$vals)==40],nc$dim$lat$vals) 
 
+lon<-nc$dim$lon$len/set
+lat<-lat.max-lat.min+1
+time<-nc$dim$time$len
+yy<-time/12
 
-#########RETRIEVE DATA#######################################
-
-######define dimensions TROPICS
-
-
-###define Time dimension by taking timval from each data set
-nc<-open.ncdf("pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc")
-s<-match(nc$dim$lat$vals[floor(nc$dim$lat$vals)==-40],nc$dim$lat$vals) ##get index 40S
-n<-match(nc$dim$lat$vals[ceiling(nc$dim$lat$vals)==40],nc$dim$lat$vals) ##index 40N
-lat<-nc$dim$lat$vals[s:n] ##lat 40S-40N
-lat<-as.vector(lat)
-lon<-nc$dim$lon$vals ##lon
-lon<-as.vector(lon)
-t250<-nc$dim$time$vals ##t250
-t250<-as.vector(t250)
+#get variable data and dimensions for the tropics
+var<-get.var.ncdf(nc, vb, start=c(1+((n-1)*lon),lat.min,1), count=c(lon,lat,-1))
 close.ncdf(nc)
 
-nc<-open.ncdf("pr_Amon_CCSM4_piControl_r1i1p1_050101-079912.nc")
-t501<-nc$dim$time$vals ##t501
-t501<-as.vector(t501)
+#convert to mm/day
+var<-var*conv
+
+##retrieve climatology
+nc<-open.ncdf(ncname)
+clim<-get.var.ncdf(nc,varname,count=c(-1,-1,12))
 close.ncdf(nc)
 
-nc<-open.ncdf("pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc")
-t800<-nc$dim$time$vals ##t800
-t800<-as.vector(t800)
+clim<-replicate(yy,abind(clim,along=3))
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																				dim(clim)<-dim(var)
+
+
+
+
+
+
+
+
+
+
+
+##make clim array for data set
+res<-lat*lon ##resolution, i.e. #gridboxes
+dim(clim)<-c(12,(res)) ##make matrix [month,loc]
+clim<-t(clim) ##[loc,month]
+clim<-replicate(yy/12,clim) ##array[55296,12,250] =[loc,month,yrs]
+dim(clim)<-c(lat,lon,yy) #monthly mean at each grid box over entire period
+
+##remove climatological mean
+nc.1<-nc.1-clim ##climatological anomaly 
+rm(clim,lat,lon,nc,res)
+
+
+##create anomaly ncdf
+nc<-create.ncdf("CCSM4_pr_piC_anom_tropics.nc",anom)
 close.ncdf(nc)
 
-t<-abind(t250,t501,t800) #250-1300
-t<-as.vector(t)
+##add data to variable
+nc<-open.ncdf("CCSM4_pr_piC_anom_tropics.nc", write=T)
+put.var.ncdf( nc, nc$var$ClimAnom, nc.1, start=c(1,1,1), count=c(-1,-1,yy) )
+close.ncdf(nc)
 
-tdim <- dim.def.ncdf( "Time", "days since 0001-01-01 00:00:00", t,unlim=TRUE)
-latdim<-dim.def.ncdf("Latitude (Tropics)","degrees_north",lat)
-londim<-dim.def.ncdf("Longitude","degrees_east",lon)
 
-rm(lat,lon,nc,t,t250,t501,t800)
 
 
 #### define variables
-anom<-var.def.ncdf("ClimAnom","mm/day",list(latdim,londim,tdim),NA,longname="Precipitation Anomaly 250-1300")
+anom<-var.def.ncdf("anomaly1","mm/day",list(latdim,londim,tdim),NA,longname="Precipitation Anomaly")
 
-rm(latdim,londim,tdim,n,s)
+
+
+
+
+
+
 
 
 

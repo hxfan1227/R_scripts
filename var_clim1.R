@@ -3,7 +3,7 @@
 
 ###section 1
 data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
-var<-	"pr"		##name of variable extracted
+vb<-	"pr"		##name of variable extracted
 conv<-86400		##unit conversion (1 if NA)
 	#precipitation mm/day: 86400
 
@@ -37,7 +37,7 @@ yy<-time/12
 
 
 #get variable data and dimensions for the tropics
-var<-get.var.ncdf(nc, "pr", start=c(1+((n-1)*lon),lat.min,1), count=c(lon,lat,-1))
+var<-get.var.ncdf(nc, vb, start=c(1+((n-1)*lon),lat.min,1), count=c(lon,lat,-1))
 close.ncdf(nc)
 
 #convert to mm/day
