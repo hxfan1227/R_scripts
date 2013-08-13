@@ -4,10 +4,12 @@
 ncname<-"CCSM4_pr_piC_clim1.nc"	##name of netCDF file with clims
 units<- "mm/day"		##units of variable
 varclim<-"climatology1"		##name of climatology variable created
-varanom<-"anomaly250_500"		##name of anomaly variable created
-varanomlong<-"Precipitation Anomaly250_500"	##anom variable long name
+varanom<-"anomaly1"		##name of anomaly variable created
+varanomlong<-"Precipitation Anomaly"	##anom variable long name
 
 data<-"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc"	##dataset name
+start<-250			##first year of dataset being used
+run<-250			##first year of total timeseries
 vb<-"pr"			##variable name
 conv<-86400		##unit conversion (1 if NA)
 	#precipitation mm/day: 86400
@@ -64,6 +66,7 @@ nc<-var.add.ncdf(nc,anom)
 close.ncdf(nc)
 #add data to variable
 nc<-open.ncdf(ncname,write=T)
-put.var.ncdf(nc,varanom,var, start=c(1,1,1), count=c(-1,-1,time))
+st<-(start-run)*12+1
+put.var.ncdf(nc,varanom,var, start=c(1,1,st), count=c(-1,-1,time))
 close.ncdf(nc)
 

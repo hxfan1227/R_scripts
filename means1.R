@@ -22,7 +22,7 @@ close.ncdf(nc)
 
 #section 2
 set<-	3	##if dataset is too large, this breaks it into n sets along lon. 
-n<-3		##number of the set being calculated. 
+n<-1		##number of the set being calculated. 
 
 #section 3
 mm<-	5	##number of months retained
