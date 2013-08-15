@@ -13,5 +13,6 @@ Execute scripts in this order:
 4. means[n].R
 	calculates annual and seasonal means of the anomalies from step 3. The type of mean can be selected in the header; generally run this three times to get annual, winter and summer means. Variables are stored in the same netCDF files as climatologies and anomaly.
 
-5.
+5. EOF.R
+	This script concatenates means for all lons and calculates the EOFs. EOFs, variances, PCs and correlations for the first 3 EOFs get saved in a .csv file for each mean type
 
