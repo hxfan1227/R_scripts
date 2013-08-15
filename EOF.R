@@ -73,22 +73,15 @@ nc<-open.ncdf(eofnc,write=T)
 put.var.ncdf(nc,var,ncmean)
 
 close.ncdf(nc)
-#################################################15/8/13
-
-
-
-
-
-
-
 
 
 ###3. ########### Calculate EOFs
 ##get mean dataset
-open.ncdf(eofnc)
+nc<-open.ncdf(eofnc,write=T)
 ncmean<-get.var.ncdf(nc,var)
-lon<-eofnc$dim$lon$len
-lat<-eofnc$dim$lat$len
+lon<-nc$dim$lon$len
+lat<-nc$dim$lat$len
+
 close.ncdf(nc)
 ##detrend data
 nc<-wrap(ncmean,map=list(NA,3)) #make a matrix [lon*lat,time]
@@ -103,23 +96,28 @@ B<-eig$vectors #eigenvectors B
 D<-t(nc)%*%B #proportional EOFs
 eof<-sweep(D, 2, sqrt(colSums(D^2)), FUN="/") #normalise EOFs
 
-#write EOFs to .csv file
-write.csv(eof,file,colnames="EOFs")
+#write first 10 EOFs to .csv file
+write.table(eof[,1:10],file)
 
 ##variance explained by each EOF
 variance<-diag(lam)/tr(lam) 
 variance[1:10]*100 #variance % for first 10 EOFs
 
 #write variance to .csv file
-write.csv(variance,file,append=T,rownames=var)
+write.table(variance[1:10],file,append=T,col.names="Variance")
 
 ##EOF1
 eof1<-eof[,1] #1st EOF
 pc1<-nc%*%eof1 #PC1
 corr1<-cor(pc1,nc,method="spearman") #correlation1
 #write PC1 and correlation1 to .csv file
-write.csv(pc1,file,append=T,rownames="PC1")
-write.csv(corr1,file,append=T,rownames="Correlation1")
+write.table(pc1,file,append=T,col.names="PC1")
+#########################################################15/8
+
+##command below doesn't work... invalid col.names specification???
+
+
+write.table(corr1,file,append=T,col.names="Correlation1")
 
 dim(corr1)<-c(lon,lat) 
 varexp1<-(corr1^2)*100
@@ -129,8 +127,8 @@ eof2<-eof[,2] #1st EOF
 pc2<-nc%*%eof2 #PC1
 corr2<-cor(pc2,nc,method="spearman") #correlation1
 #write PC2 and correlation2 to .csv file
-write.csv(pc2,file,append=T,rownames="PC2")
-write.csv(corr2,file,append=T,rownames="Correlation2")
+write.table(pc2,file,append=T,col.names="PC2")
+write.table(corr2,file,append=T,col.names="Correlation2")
 
 dim(corr2)<-c(lon,lat) 
 varexp2<-(corr2^2)*100
@@ -140,8 +138,8 @@ eof3<-eof[,3] #1st EOF
 pc3<-nc%*%eof3 #PC1
 corr3<-cor(pc3,nc,method="spearman") #correlation1
 #write PC3 and correlation3 to .csv file
-write.csv(pc3,file,append=T,rownames="PC3")
-write.csv(corr3,file,append=T,rownames="Correlation3")
+write.table(pc3,file,append=T,rownames="PC3")
+write.table(corr3,file,append=T,rownames="Correlation3")
 
 dim(corr3)<-c(lon,lat) 
 varexp3<-(corr3^2)*100
