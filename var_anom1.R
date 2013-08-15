@@ -7,8 +7,8 @@ varclim<-"climatology1"		##name of climatology variable created
 varanom<-"anomaly1"		##name of anomaly variable created
 varanomlong<-"Precipitation Anomaly"	##anom variable long name
 
-data<-"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc"	##dataset name
-start<-250			##first year of dataset being used
+data<-"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc"	##dataset name
+start<-800			##first year of dataset being used
 run<-250			##first year of total timeseries
 vb<-"pr"			##variable name
 conv<-86400		##unit conversion (1 if NA)
@@ -50,7 +50,7 @@ close.ncdf(nc)
 #replicate for each year in dataset
 clim<-replicate(yy,abind(clim,along=3))
 #match variable dimensions
-(clim)<-dim(var)
+dim(clim)<-dim(var)
 
 ##remove climatological mean from data to get anomaly
 var<-var-clim
@@ -64,6 +64,8 @@ close.ncdf(nc)
 nc<-open.ncdf(ncname,write=T)
 nc<-var.add.ncdf(nc,anom)
 close.ncdf(nc)
+
+
 #add data to variable
 nc<-open.ncdf(ncname,write=T)
 st<-(start-run)*12+1
