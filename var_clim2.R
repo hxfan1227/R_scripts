@@ -2,10 +2,10 @@
 
 
 ###section 1
-data<-	"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc" ##name of dataset to be used
+data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
 ###section 2
-varname<- "clim250_500"
-longname<-"Climatology 250-500"
+varname<- "clim800_1300"
+longname<-"Climatology 800-1300"
 
 
 var<-	"pr"		##name of variable extracted
@@ -40,6 +40,7 @@ yy<-time/12
 
 #get variable data and dimensions for the tropics
 var<-get.var.ncdf(nc, "pr", start=c(1+((n-1)*lon),lat.min,1), count=c(lon,lat,-1))
+
 close.ncdf(nc)
 
 #convert to mm/day
@@ -74,6 +75,18 @@ nc<-create.ncdf(ncname, climvar)
 ##add data to netCDF file
 put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
 
+close.ncdf(nc)
+
+##SUBSEQUENT TIMES: define variable
+nc<-open.ncdf(ncname,write=T)
+climvar<-var.def.ncdf(varname,units,list(nc$dim$lon2,nc$dim$lat,nc$dim$time),NA,longname=longname)
+nc<-var.add.ncdf(nc,climvar)
+
+close.ncdf(nc)
+
+##add data to netCDF file
+nc<-open.ncdf(ncname,write=T)
+put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
 
 close.ncdf(nc)
 

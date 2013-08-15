@@ -1,8 +1,7 @@
 ##calculating tropical climatological mean SECTION 1 ####################################
-
+#This calculates climatologies for the first longitudinal section. Repeat this for all time sections. 
 
 ###section 1
-data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
 vb<-	"pr"		##name of variable extracted
 conv<-86400		##unit conversion (1 if NA)
 	#precipitation mm/day: 86400
@@ -18,7 +17,8 @@ x.max<-	96		##end lon
 ###section 2
 ncname<-"CCSM4_pr_piC_clim1.nc"
 
-varname<- "clim800_1300"
+data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
+varname<- "clim800-1300"
 units<- "mm/day"
 longname<-"Climatology 800-1300"
 
@@ -38,6 +38,7 @@ yy<-time/12
 
 #get variable data and dimensions for the tropics
 var<-get.var.ncdf(nc, vb, start=c(1+((n-1)*lon),lat.min,1), count=c(lon,lat,-1))
+
 close.ncdf(nc)
 
 #convert to mm/day
@@ -60,9 +61,12 @@ clim[i,j,]<-vaggregate(var[i,j,],mm,mean,na.rm=T)
 ###2. Create ncetCDF file ################################
 
 ##FIRST TIME: Define dimensions
+nc<-open.ncdf(data)
 x <- dim.def.ncdf( "lon1", "degrees_east", nc$dim$lon$vals[x.min:x.max])
 y <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[lat.min:lat.max])
 t <- dim.def.ncdf( "time", "timesteps", 1:12612,unlim=TRUE)
+close.ncdf(nc)
+
 ##define variables
 climvar<-var.def.ncdf(varname,units,list(x,y,t),NA,longname=longname)
 
@@ -79,11 +83,13 @@ close.ncdf(nc)
 nc<-open.ncdf(ncname,write=T)
 climvar<-var.def.ncdf(varname,units,list(nc$dim$lon1,nc$dim$lat,nc$dim$time),NA,longname=longname)
 nc<-var.add.ncdf(nc,climvar)
+
 close.ncdf(nc)
 
 ##add data to netCDF file
 nc<-open.ncdf(ncname,write=T)
 put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
+
 close.ncdf(nc)
 
 

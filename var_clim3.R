@@ -4,9 +4,9 @@
 ###section 1
 set<- 3			##number of sections
 
-data<-	"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc" ##name of dataset to be used
-varname<- "clim250_500"		##name of ncdf variable being created --> change to reflect time!
-longname<-"Climatology 250-500"	##ncdf var long name --> change to reflect time!
+data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
+varname<- "clim800-1300"		##name of ncdf variable being created --> change to reflect time!
+longname<-"Climatology 800-1300"	##ncdf var long name --> change to reflect time!
 ncname<-"CCSM4_pr_piC_clim3.nc"	##netCDF file name --> change to reflect section number!
 n<- 3			##section being calculated
 #lon bounds for the section. for lon 288: 1) 0-96	2) 97-192 	3) 193-288
@@ -35,6 +35,7 @@ yy<-time/12
 
 #get variable data and dimensions for the tropics
 var<-get.var.ncdf(nc, "pr", start=c(1+((n-1)*lon),lat.min,1), count=c(lon,lat,-1))
+
 close.ncdf(nc)
 
 #convert to mm/day
@@ -56,7 +57,7 @@ clim[i,j,]<-vaggregate(var[i,j,],mm,mean,na.rm=T)
 
 ###2. Create ncetCDF file ################################
 ##Define dimensions
-x <- dim.def.ncdf( "lon2", "degrees_east", nc$dim$lon$vals[x.min:x.max])
+x <- dim.def.ncdf( "lon3", "degrees_east", nc$dim$lon$vals[x.min:x.max])
 y <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[lat.min:lat.max])
 t <- dim.def.ncdf( "time", "timesteps", 1:12612,unlim=TRUE)
 
@@ -71,5 +72,19 @@ put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
 
 
 close.ncdf(nc)
+
+##SUBSEQUENT TIMES: define variable
+nc<-open.ncdf(ncname,write=T)
+climvar<-var.def.ncdf(varname,units,list(nc$dim$lon3,nc$dim$lat,nc$dim$time),NA,longname=longname)
+nc<-var.add.ncdf(nc,climvar)
+
+close.ncdf(nc)
+
+##add data to netCDF file
+nc<-open.ncdf(ncname,write=T)
+put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
+
+close.ncdf(nc)
+
 
 

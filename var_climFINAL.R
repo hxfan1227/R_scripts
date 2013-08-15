@@ -1,28 +1,14 @@
 #### Calculate final climatology ###################
-####this script will calculate the final climatology over the entire timeseries
+####this script will calculate the final climatology over the entire timeseries. Repeat this for each lon section!!
 
-ncname<-"CCSM4_pr_piC_clim1.nc"	##name of netCDF file with clims
+ncname<-"CCSM4_pr_piC_clim3.nc"	##name of netCDF file with clims
 units<- "mm/day"		##units of variable
-varclim<-"climatology1"		##name of climatology variable created
-long <-nc$dim$lon1		##lon dimension (change lon1/2/3)
-longlen<- nc$dim$lon1$len	##lon dimension length (lon1/2/3)
-
-nt<-2				##number of timesets in clim netCDF
-
-data<-"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc"	##dataset name
-vb<-"pr"			##variable name
-conv<-86400		##unit conversion (1 if NA)
-	#precipitation mm/day: 86400
-
-#Break dataset into spatial (lon) sections
-set<- 3			##number of sections
-n<- 1			##section being used
-
-x.min<- 0		##start lon
-x.max<-	96		##end lon
-	#for lon 288: 0-96,97-192, 193-288
-
-
+varclim<-"climatology3"		##name of climatology variable created
+nc<-open.ncdf(ncname)
+long <-nc$dim$lon3		##lon dimension (change lon1/2/3)
+longlen<- nc$dim$lon3$len	##lon dimension length (lon1/2/3)
+close.ncdf(nc)
+nt<-3				##number of timesets in clim netCDF
 
 
 ###1. CLIMATOLOGICAL MEAN #########
@@ -56,9 +42,10 @@ monmean<-var.def.ncdf(varclim,units,list(long,nc$dim$lat,nc$dim$time),NA,longnam
 ##add variable and data
 nc<-open.ncdf(ncname, write=T)
 nc<-var.add.ncdf(nc,monmean)
-close.ncdf(nc)
 
+close.ncdf(nc)
 nc<-open.ncdf(ncname, write=T)
 put.var.ncdf(nc,varclim,clim,count=c(-1,-1,12))
+
 close.ncdf(nc)
 

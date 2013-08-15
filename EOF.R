@@ -10,7 +10,7 @@ data3 <- "CCSM4_pr_piC_clim3.nc"	##netCDF filename to extract data from
 
 orig<-"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc" ##original dataset; used to define dimensions of new netCDF
 
-var<- "annual_mean"		##variable to extract, suggested format "xxx_mean" where xxx are months/seasons 
+var<- "annual_mean"		##variable to extract and create, suggested format "xxx_mean" where xxx are months/seasons 
 units<-"mm/day" 		##variable units
 longname<-"Annual Mean Precipitation 250-1300"
 
@@ -27,15 +27,17 @@ file<- "CCSM4_pr_piC_EOF.csv"		##where to store output
 
 
 ######## Create new netCDF file for full means and EOFs 
-##define dimensions
+##define dimensions; lon from original dataset to get full range
 nc<-open.ncdf(orig, write=T)
 lon<-nc$dim$lon
 close.ncdf(nc)
-
-nc<-open.ncdf(data, write=T)
+##get lat and time from calculated datasets (should be same for all lon sets)
+nc<-open.ncdf(data1, write=T)
 lat<-nc$dim$lat
 time<-nc$dim$time
 time$vals<-1:yy
+
+
 close.ncdf(nc)
 
 ##define variables
@@ -43,31 +45,42 @@ meanvar<-var.def.ncdf(var,units,dim=list(lon,lat,time),missval=NA,longname=longn
 
 ##create netCDF file
 nc<-create.ncdf(eofnc,meanvar)
+
+
 close.ncdf(nc)
 
 ###2. ####### Concatenate means to get full lon 
 ##get lon1 set
 nc<-open.ncdf(data1, write=T)
 nc1<-get.var.ncdf(nc,var,start=c(1,1,1),count=c(-1,-1,yy)) 
-lon1<-nc1$dim$lon1$len
+lon1<-nc$dim$lon1$len
 close.ncdf(nc)
 ##get lon2 set
 nc<-open.ncdf(data2, write=T)
 nc2<-get.var.ncdf(nc,var,start=c(1,1,1),count=c(-1,-1,yy)) 
-lon2<-nc1$dim$lon2$len
+lon2<-nc$dim$lon2$len
 close.ncdf(nc)
 ##get lon3 set
 nc<-open.ncdf(data3, write=T)
 nc3<-get.var.ncdf(nc,var,start=c(1,1,1),count=c(-1,-1,yy)) 
-lon3<-nc1$dim$lon3$len
+lon3<-nc$dim$lon3$len
 close.ncdf(nc)
 ##combine all lon sets
-ncmean<-abind(nc1,nc2,nc3,along=1) ##CHECK THIS!!! 
+ncmean<-abind(nc1,nc2,nc3,along=1)  
 
 ##write means to netCDF
-nc<-open.ncdf(eofnc)
+nc<-open.ncdf(eofnc,write=T)
 put.var.ncdf(nc,var,ncmean)
+
 close.ncdf(nc)
+#################################################15/8/13
+
+
+
+
+
+
+
 
 
 ###3. ########### Calculate EOFs

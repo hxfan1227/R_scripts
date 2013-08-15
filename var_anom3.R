@@ -1,10 +1,10 @@
 #### Calculate anomalies ###################
 ## this script will calculate the climate anomalies. Repeat this for all time sets.
 
-ncname<-"CCSM4_pr_piC_clim1.nc"	##name of netCDF file with clims
+ncname<-"CCSM4_pr_piC_clim3.nc"	##name of netCDF file with clims
 units<- "mm/day"		##units of variable
-varclim<-"climatology1"		##name of climatology variable created
-varanom<-"anomaly1"		##name of anomaly variable created
+varclim<-"climatology3"		##name of climatology variable created
+varanom<-"anomaly3"		##name of anomaly variable created
 varanomlong<-"Precipitation Anomaly"	##anom variable long name
 
 data<-"pr_Amon_CCSM4_piControl_r1i1p1_050101-079912.nc"	##dataset name
@@ -16,10 +16,10 @@ conv<-86400		##unit conversion (1 if NA)
 
 #Break dataset into spatial (lon) sections
 set<- 3			##number of sections
-n<- 1			##section being used
+n<- 3			##section being used
 
-x.min<- 0		##start lon
-x.max<-	96		##end lon
+x.min<- 97		##start lon
+x.max<-	192		##end lon
 	#for lon 288: 0-96,97-192, 193-288
 
 
@@ -56,16 +56,25 @@ dim(clim)<-dim(var)
 ##remove climatological mean from data to get anomaly
 var<-var-clim
 
+
+
 #####2. Add to netCDF file #####################
+
 ###FIRST TIME ONLY
 #define netCDF variable
 nc<-open.ncdf(ncname,write=T)
-anom<-var.def.ncdf(varanom,units,list(nc$dim$lon1,nc$dim$lat,nc$dim$time),NA,longname=varanomlong)
+anom<-var.def.ncdf(varanom,units,list(nc$dim$lon3,nc$dim$lat,nc$dim$time),NA,longname=varanomlong)
 
 close.ncdf(nc)
 #add variable to netCDF
 nc<-open.ncdf(ncname,write=T)
 nc<-var.add.ncdf(nc,anom)
+
+close.ncdf(nc)
+#add data to variable
+nc<-open.ncdf(ncname,write=T)
+st<-(start-run)*12+1
+put.var.ncdf(nc,varanom,var, start=c(1,1,st), count=c(-1,-1,time))
 
 close.ncdf(nc)
 

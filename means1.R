@@ -1,21 +1,27 @@
 ############################# CALCULATING MEANS	####################
 # you can calculate means for selected months using the code below. Annual means obviously require all months, whereas seasonal means are derived from certain months only. 
 #instructions for specific adaptations are given along the way. Generally tab spaces indicate where things need to be completed 
+# Repeat for all lon sections!!
 
-#section 1
-data<-	"CCSM4_pr_piC_clim1.nc"		##netCDF filename (in quotation marks!) to extract data from/write data to
-meanvar<- "summer_mean"		##new variable name, suggested format "xxx_mean" where xxx are months/seasons 
-varlong<-"Summer Mean Precipitation 250-1300"		##new variable long name, suggested format "xxx Mean Precipitation 250-1300"
+
+####parameters
+set<-	3	##if dataset is too large, this breaks it into n sets along lon. 
+n<-3		##number of the set being calculated. 
+
+data<-	"CCSM4_pr_piC_clim3.nc"		##netCDF filename (in quotation marks!) to extract data from/write data to
+anomvar<-"anomaly3"		##anomaly variable used
+
+nc<-open.ncdf(data, write=T)
+londim<-nc$dim$lon3		##lon dimension (change lon[n])
+close.ncdf(nc)
+
+meanvar<- "annual_mean"		##new variable name, suggested format "xxx_mean" where xxx are months/seasons 
+varlong<-"Annual Mean Precipitation 250-1300"		##new variable long name, suggested format "xxx Mean Precipitation 250-1300"
 units<-"mm/day" 		##variable units
 
-#section 2
-set<-	3	##if dataset is too large, this breaks it into n sets along lon. 
-n<-1		##number of the set being calculated. 
-
-#section 3
-mm<-	5	##number of months retained
-start<- 5	##first month to remove/select
-end<-	9	##last month to remove/select
+mm<-	12	##number of months retained
+start<- 1	##first month to remove/select
+end<-	12	##last month to remove/select
 	#annual = 1:12
 	#winter NDJFM = 4:10 (remove)
 	#summer MJJAS = 5:9 (select)
@@ -25,25 +31,26 @@ end<-	9	##last month to remove/select
 # 1. ########define new variable
 nc<-open.ncdf(data, write=T)
 ##define variable
-newmean<-var.def.ncdf(meanvar, units, list(nc$dim$lon1,nc$dim$lat,nc$dim$time),missval=NA, 
+newmean<-var.def.ncdf(meanvar, units, list(londim,nc$dim$lat,nc$dim$time),missval=NA, 
 longname=varlong)  
 
 ##add to netcdf file
 nc<-var.add.ncdf(nc,newmean) 
+
+
 close.ncdf(nc)
-
-
 
 ###### Calculating mean #########################
 # 2. ########get data
 nc<-open.ncdf(data, write=T) 
-lon<-nc$dim$lon$len 
+lon<-londim$len 
 time<-nc$dim$time$len ##number of timesteps
 yy<-time/12 ## number of years 
 lat<-nc$dim$lat$len ##number of lats
 
 ##retrieve data
-anom<-get.var.ncdf(nc,"anomaly1",start=c(1,1,1),count=c(-1,-1,-1)) ##data anomaly1[lon,lat,time]
+anom<-get.var.ncdf(nc,anomvar,start=c(1,1,1),count=c(-1,-1,-1)) ##data anomaly1[lon,lat,time]
+
 close.ncdf(nc)
 
 ##label the time dimension to be able to select required months
@@ -60,7 +67,10 @@ colnames(anom)<-yr
 	#a) remove months (if the required ones are not consecutive within a year); or 
 	#b) directly extract a number of months. The former is applicable for e.g. winter, the latter can be used for e.g. summer.
 
-####a) selecting months to remove
+
+
+
+####a) WINTER: selecting months to remove
 	remove<-colnames(anom)[start:end] 
 	#remove cols of unwanted months
 	anom<-anom[,!colnames(anom) %in% remove]
@@ -72,7 +82,10 @@ colnames(anom)<-yr
 	yy<-ncol(anom)/mm	
 
 
-####b) directly selecting months 
+
+
+
+####b) ANNUAL/SUMMER: directly selecting months 
 	extract<-colnames(anom)[start:end] 
 	#extract cols of wanted months
 	anom<-anom[,colnames(anom) %in% extract]
@@ -100,25 +113,12 @@ ncmean[i,j,]<-vaggregate(anom[i,j,],y,mean)
 nc<-open.ncdf(data, write=T)
 ##put data into variable
 put.var.ncdf(nc,meanvar,ncmean, start=c(1,1,1),count=c(-1,-1,yy)) 
+
+
 close.ncdf(nc)
 
 
 
 
-
-
-
-
-
-
-
-
-##REPEAT STEPS 2-4 AS OFTEN AS NECESSARY
-
-# 5. ###########combining all sections
-ncmean<-abind(ncmean1		#section 1
-,ncmean2	#section 2
-,ncmean3	#section 3... etc - add more as necessary
-,along=	2)
 
 
