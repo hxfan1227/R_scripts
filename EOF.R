@@ -145,113 +145,48 @@ write.table(correlation,varfile,append=T,col.names=cols)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################# is this necessary??? ################
-#switch lon
-east<-round(lon/2)
-west<-lon-east
-nc.e<-nc.1[,,1:east]
-nc.w<-nc.1[,,west:lon]
-nc1<-abind(nc.w,nc.e,along=3)
-
-rm(nc.1,nc.e,nc.w,east,west)
-#######################################################
-
-
 ############MAPS
 ##change EOF dimensions
-dim(eof.1k)<-c(192,288) #1st EOF, in [lat,lon] last millennium
-eof.1k<-t(eof.1k) #change to [lon,lat]
+dim(eof1)<-c(lon,lat) #1st EOF, in [lon,lat] 
+dim(eof2)<-c(lon,lat) #
+dim(eof3)<-c(lon,lat) #
 
-dim(eof.2k)<-c(192,288) #1st EOF, in [lat,lon] last millennium
-eof.2k<-t(eof.2k) #change to [lon,lat]
-
-
-#map settings
-ccsm<-open.ncdf("pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc") #extract lat, lon vectors
-lon<-get.var.ncdf(ccsm,"lon") 
-lat<-get.var.ncdf(ccsm,"lat")
+##map settings
+ccsm<-open.ncdf(eofnc) #extract lat, lon vectors
+londim<-get.var.ncdf(ccsm,"lon") 
+latdim<-get.var.ncdf(ccsm,"lat")
+close.ncdf(ccsm)
 
 data(world2HiresMapEnv) #map contours
 colour<-colorRampPalette(c("red","white","blue"), space="rgb")
 colour2<-colorRampPalette(c("white","yellow","orange","red"), space="rgb")
 
+#EOF1
+png(filename="EOF1.png", width=300,height=200,units="mm",res=100) 
 
+filled.contour(londim,latdim, eof1*100, nlevels=100, zlim=c(-4,4), color.palette=colour, plot.title=title(main="1st EOF (CCSM4 piControl)", font=2, lwd=10), plot.axes={maps::map(database="world2Hires", interior=T, add=T, lwd=3)},mar=map.axes())
 
-##past millennium
-#global EOF1
-png(filename="EOF_1_1k.png", width=930,height=560) ##EOF1
-filled.contour(lon, lat, eof.1k*100, nlevels=40, zlim=c(-4,4), color.palette=colour, plot.title=title(main="1st EOF Last Millennium"),plot.axes={maps::map(database="world2Hires",interior=T,add=T)})
 dev.off()
 
-png(filename="Correlation_1_1k.png", width=930,height=560) ## correlation1
-filled.contour(lon, lat, corr.1k, nlevels=40, zlim=c(-1,1), color.palette=colour, plot.title=title(main="1st EOF Correlation Last Millennium"),plot.axes={maps::map(database="world2Hires",interior=T,add=T)})
-dev.off()
-
-png(filename="Variance_1_1k.png", width=930,height=560) ## variance explained1
-filled.contour(lon, lat, varexp.1k, nlevels=40, zlim=c(0,100), color.palette=colour2, plot.title=title(main="Variance Explained by EOF1 Last Millennium"),plot.axes={maps::map(database="world2Hires",interior=T,add=T)})
-dev.off()
-
-png("PC1_Var_1k.png", width=930,height=560) # PC1 and variance
+#PC and variance
+png("PC_Var.png", width=500,height=400,units="mm",res=100) # PC1 and variance
 plot.new()
-par(mfrow=c(2,1)) #2 figures in 2 rows, 1 column
-plot.ts(pc.1k,xlab="Year AD",ylab="",main="PC1 Last Millennium")
-plot(var.1k[1:10]*100, main="Variances",xlab="EOF",ylab="Variance (%)",type="l")
+par(mfrow=c(4,1)) #2 figures in 2 rows, 1 column
+plot.ts(pc1,xlab="Years",ylab="",main="PC1",cex=3)
+plot.ts(pc2,xlab="Years",ylab="",main="PC2",cex=3)
+plot.ts(pc1,xlab="Years",ylab="",main="PC3",cex=3)
+plot(variance[1:10]*100, main="Variances",xlab="EOF",ylab="Variance (%)",type="l")
 dev.off()
 
-#global EOF2
-png(filename="EOF_2_1k.png", width=930,height=560) ##EOF1
-filled.contour(lon, lat, eof.2k*100, nlevels=40, zlim=c(-4,4), color.palette=colour, plot.title=title(main="2nd EOF Last Millennium"),plot.axes={maps::map(database="world2Hires",interior=T,add=T)})
+#Correlation1
+png(filename="Correlation1.png", width=300, height=200, units="mm", res=100) 
+filled.contour(londim, latdim, corr1, nlevels=100, zlim=c(-1,1), color.palette=colour, plot.title=title(main="1st EOF Correlation", font=2, lwd=10),plot.axes={maps::map(database="world2Hires",interior=T,add=T, lwd=3)})
 dev.off()
 
-png(filename="Correlation_2_1k.png", width=930,height=560) ## correlation1
-filled.contour(lon, lat, corr.2k, nlevels=40, zlim=c(-1,1), color.palette=colour, plot.title=title(main="2nd EOF Correlation Last Millennium"),plot.axes={maps::map(database="world2Hires",interior=T,add=T)})
+#Variance explained1
+png(filename="Variance1.png", width=300, height=200, units="mm", res=100) ## variance explained1
+filled.contour(londim, latdim, varexp1, nlevels=100, zlim=c(0,100), color.palette=colour2, plot.title=title(main="Variance Explained by EOF1"),plot.axes={maps::map(database="world2Hires",interior=T,add=T)})
 dev.off()
-
-png(filename="Variance_2_1k.png", width=930,height=560) ## variance explained1
-filled.contour(lon, lat, varexp.2k, nlevels=40, zlim=c(0,100), color.palette=colour2, plot.title=title(main="Variance Explained by EOF2 Last Millennium"),plot.axes={maps::map(database="world2Hires",interior=T,add=T)})948
-dev.off()
-
-png("PC2_Var_1k.png", width=930,height=560) # PC1 and variance
-plot.new()
-par(mfrow=c(2,1)) #2 figures in 2 rows, 1 column
-plot.ts(pc.2k,xlab="Year AD",ylab="",main="PC2 Last Millennium")
-plot(var.1k[1:10]*100, main="Variances",xlab="EOF",ylab="Variance (%)",type="l")
-dev.off()
-
-
-png("PC1_MCA_LIA_1k.png", width=930,height=560) # PC1 and variance
-plot.new()
-par(mfrow=c(2,1)) #2 figures in 2 rows, 1 column
-plot.ts(pc.1k[150:450],xlim=c(0,450),ylim=c(-150,150),xlab="Year since AD 1000",ylab="",main="PC1 MCA")
-plot.ts(pc.1k[550:1000],xlim=c(0,450),ylim=c(-150,150),xlab="Year since AD 1400",ylab="",main="PC1 LIA")
-dev.off()
-
-
-
 
 
 
