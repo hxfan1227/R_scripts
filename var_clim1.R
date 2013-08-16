@@ -13,14 +13,15 @@ n<- 1			##section being used
 x.min<- 0		##start lon
 x.max<-	96		##end lon
 	#for lon 288: 0-96,97-192, 193-288
+totaltime<-3612		##full dataset time length (all time sets)
 
 ###section 2
-ncname<-"CCSM4_pr_piC_clim1.nc"
+ncname<-"CCSM4_pr_mh_clim1.nc"
 
-data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
-varname<- "clim800-1300"
+data<-	"pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc" ##name of dataset to be used
+varname<- "climatology1"
 units<- "mm/day"
-longname<-"Climatology 800-1300"
+longname<-"Climatology"
 
 
 ###1. Get precipitation data (tropics) ##############
@@ -64,7 +65,7 @@ clim[i,j,]<-vaggregate(var[i,j,],mm,mean,na.rm=T)
 nc<-open.ncdf(data)
 x <- dim.def.ncdf( "lon1", "degrees_east", nc$dim$lon$vals[x.min:x.max])
 y <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[lat.min:lat.max])
-t <- dim.def.ncdf( "time", "timesteps", 1:12612,unlim=TRUE)
+t <- dim.def.ncdf( "time", "timesteps", 1:totaltime,unlim=TRUE)
 close.ncdf(nc)
 
 ##define variables
@@ -75,6 +76,7 @@ nc<-create.ncdf(ncname, climvar)
 
 ##add data to netCDF file
 put.var.ncdf(nc,varname,clim,start=c(1,1,1),count=c(-1,-1,12))
+
 close.ncdf(nc)
 
 

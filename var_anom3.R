@@ -1,15 +1,15 @@
 #### Calculate anomalies ###################
 ## this script will calculate the climate anomalies. Repeat this for all time sets.
 
-ncname<-"CCSM4_pr_piC_clim3.nc"	##name of netCDF file with clims
+ncname<-"CCSM4_pr_mh_clim3.nc"	##name of netCDF file with clims
 units<- "mm/day"		##units of variable
 varclim<-"climatology3"		##name of climatology variable created
 varanom<-"anomaly3"		##name of anomaly variable created
 varanomlong<-"Precipitation Anomaly"	##anom variable long name
 
-data<-"pr_Amon_CCSM4_piControl_r1i1p1_050101-079912.nc"	##dataset name
-start<-501			##first year of dataset being used
-run<-250			##first year of total timeseries
+data<-"pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc" ##dataset name
+start<-1000			##first year of dataset being used
+run<-1000			##first year of total timeseries
 vb<-"pr"			##variable name
 conv<-86400		##unit conversion (1 if NA)
 	#precipitation mm/day: 86400

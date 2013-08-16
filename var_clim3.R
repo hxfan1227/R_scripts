@@ -4,10 +4,10 @@
 ###section 1
 set<- 3			##number of sections
 
-data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
-varname<- "clim800-1300"		##name of ncdf variable being created --> change to reflect time!
-longname<-"Climatology 800-1300"	##ncdf var long name --> change to reflect time!
-ncname<-"CCSM4_pr_piC_clim3.nc"	##netCDF file name --> change to reflect section number!
+data<-	"pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc" ##name of dataset to be used
+varname<- "climatology3"		##name of ncdf variable being created --> change to reflect time!
+longname<-"Climatology"	##ncdf var long name --> change to reflect time!
+ncname<-"CCSM4_pr_mh_clim3.nc"	##netCDF file name --> change to reflect section number!
 n<- 3			##section being calculated
 #lon bounds for the section. for lon 288: 1) 0-96	2) 97-192 	3) 193-288
 x.min<- 193		##start lon
@@ -17,6 +17,7 @@ var<-	"pr"		##name of variable extracted
 conv<-86400		##unit conversion (1 if NA)
 	#precipitation mm/day: 86400
 units<- "mm/day" 	##units of final variable
+totaltime<-3612		##full dataset time length (all time sets)
 
 
 
@@ -59,7 +60,7 @@ clim[i,j,]<-vaggregate(var[i,j,],mm,mean,na.rm=T)
 ##Define dimensions
 x <- dim.def.ncdf( "lon3", "degrees_east", nc$dim$lon$vals[x.min:x.max])
 y <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[lat.min:lat.max])
-t <- dim.def.ncdf( "time", "timesteps", 1:12612,unlim=TRUE)
+t <- dim.def.ncdf( "time", "timesteps", 1:totaltime,unlim=TRUE)
 
 ##define variables
 climvar<-var.def.ncdf(varname,units,list(x,y,t),NA,longname=longname)

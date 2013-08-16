@@ -4,27 +4,30 @@
 ### parameters
 set<-	3	##if dataset is too large, this breaks it into n sets along lon. 
 ##have as many 'data' objects as there are sets!
-data1 <- "CCSM4_pr_piC_clim1.nc"	##netCDF filename to extract data from
-data2 <- "CCSM4_pr_piC_clim2.nc"	##netCDF filename to extract data from
-data3 <- "CCSM4_pr_piC_clim3.nc"	##netCDF filename to extract data from
+data1 <- "CCSM4_pr_mh_clim1.nc"	##netCDF filename to extract data from
+data2 <- "CCSM4_pr_mh_clim2.nc"	##netCDF filename to extract data from
+data3 <- "CCSM4_pr_mh_clim3.nc"	##netCDF filename to extract data from
 
-orig<-"pr_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc" ##original dataset; used to define dimensions of new netCDF
+orig<-"pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc" ##original dataset; used to define dimensions of new netCDF
 
-var<- "annual_mean"		##variable to extract and create, suggested format "xxx_mean" where xxx are months/seasons 
+varmean<- "annual_mean"		##variable to extract and create, suggested format "xxx_mean" where xxx are months/seasons 
+vareof<-"eof"
+
 units<-"mm/day" 		##variable units
-longname<-"Annual Mean Precipitation 250-1300"
+longmean<-"Annual Mean Precipitation Mid Holocene"
+longeof<-"EOF"
 
-start<-250			##dataset starting year
+start<-1000			##dataset starting year
 end<- 1300			##dataset ending year
 yy<-length(start:end)		##dataset time length 
 
-eofnc<-	"CCSM4_pr_piC_annualmeanEOF.nc"		##new netCDF for EOF analysis
-eof1long<-"EOF1 250-1300"		##new variable long name, suggested format 
-eof2long<-"EOF2 250-1300"		##new variable long name, suggested format
-eof3long<-"EOF3 250-1300"		##new variable long name, suggested format
-eoffile<- "CCSM4_pr_piC_EOF.csv"	##where to store EOF/PC output 
+eofnc<-	"CCSM4_pr_mh_meanEOF.nc"		##new netCDF for EOF analysis
+eof1long<-"EOF1 Mid Holocene"		##new variable long name, suggested format 
+eof2long<-"EOF2 Mid Holocene"		##new variable long name, suggested format
+eof3long<-"EOF3 Mid Holocene"		##new variable long name, suggested format
+eoffile<- "CCSM4_pr_mh_EOF.csv"	##where to store EOF/PC output 
 	## use"[model]_[variable]_[run]_[meantype]EOF.csv"
-varfile<-"CCSM4_pr_piC_var.csv"		##where to store var/corr output
+varfile<-"CCSM4_pr_mh_var.csv"		##where to store var/corr output
 
 
 ######## Create new netCDF file for full means and EOFs 
@@ -42,10 +45,11 @@ time$vals<-1:yy
 close.ncdf(nc)
 
 ##define variables
-meanvar<-var.def.ncdf(var,units,dim=list(lon,lat,time),missval=NA,longname=longname)
+meanvar<-var.def.ncdf(varmean,units,dim=list(lon,lat,time),missval=NA,longname=longmean)
+eofvar<-var.def.ncdf(vareof,units,dim=list(lon,lat,time),missval=NA,longname=longeof)
 
 ##create netCDF file
-nc<-create.ncdf(eofnc,meanvar)
+nc<-create.ncdf(eofnc,list(meanvar,eofvar))
 
 
 close.ncdf(nc)
@@ -53,17 +57,17 @@ close.ncdf(nc)
 ###2. ####### Concatenate means to get full lon 
 ##get lon1 set
 nc<-open.ncdf(data1, write=T)
-nc1<-get.var.ncdf(nc,var,start=c(1,1,1),count=c(-1,-1,yy)) 
+nc1<-get.var.ncdf(nc,varmean,start=c(1,1,1),count=c(-1,-1,yy)) 
 lon1<-nc$dim$lon1$len
 close.ncdf(nc)
 ##get lon2 set
 nc<-open.ncdf(data2, write=T)
-nc2<-get.var.ncdf(nc,var,start=c(1,1,1),count=c(-1,-1,yy)) 
+nc2<-get.var.ncdf(nc,varmean,start=c(1,1,1),count=c(-1,-1,yy)) 
 lon2<-nc$dim$lon2$len
 close.ncdf(nc)
 ##get lon3 set
 nc<-open.ncdf(data3, write=T)
-nc3<-get.var.ncdf(nc,var,start=c(1,1,1),count=c(-1,-1,yy)) 
+nc3<-get.var.ncdf(nc,varmean,start=c(1,1,1),count=c(-1,-1,yy)) 
 lon3<-nc$dim$lon3$len
 close.ncdf(nc)
 ##combine all lon sets
@@ -71,7 +75,7 @@ ncmean<-abind(nc1,nc2,nc3,along=1)
 
 ##write means to netCDF
 nc<-open.ncdf(eofnc,write=T)
-put.var.ncdf(nc,var,ncmean)
+put.var.ncdf(nc,varmean,ncmean)
 
 close.ncdf(nc)
 
@@ -79,7 +83,7 @@ close.ncdf(nc)
 ###3. ########### Calculate EOFs
 ##get mean dataset
 nc<-open.ncdf(eofnc,write=T)
-ncmean<-get.var.ncdf(nc,var)
+ncmean<-get.var.ncdf(nc,varmean)
 lon<-nc$dim$lon$len
 lat<-nc$dim$lat$len
 
@@ -96,6 +100,7 @@ lam<-diag(eig$values, nrow = length(eig$values)) #diagonal matrix Lambda (=value
 B<-eig$vectors #eigenvectors B
 D<-t(nc)%*%B #proportional EOFs
 eof<-sweep(D, 2, sqrt(colSums(D^2)), FUN="/") #normalise EOFs
+
 
 #write first 10 EOFs to .csv eoffile
 write.table(eof[,1:10],eoffile,col.names=list("EOF1", "EOF2","EOF3","EOF4","EOF5","EOF6","EOF7","EOF8","EOF9","EOF10"))
@@ -141,7 +146,12 @@ cols<-gl(3,lat,labels=list("Correlation1","Correlation2","Correlation3"))
 #write correlation to .csv varfile
 write.table(correlation,varfile,append=T,col.names=cols)
 
+#add EOF to netCDF file
+nc<-open.ncdf(eofnc,write=T)
+dim(eof)<-c(lon,lat,yy)
+put.var.ncdf(nc,vareof,eof[,,1:10],count=c(-1,-1,10))
 
+close.ncdf(nc)
 
 
 
@@ -164,7 +174,7 @@ colour2<-colorRampPalette(c("white","yellow","orange","red"), space="rgb")
 #EOF1
 png(filename="EOF1.png", width=300,height=200,units="mm",res=100) 
 
-filled.contour(londim,latdim, eof1*100, nlevels=100, zlim=c(-4,4), color.palette=colour, plot.title=title(main="1st EOF (CCSM4 piControl)", font=2, lwd=10), plot.axes={maps::map(database="world2Hires", interior=T, add=T, lwd=3)},mar=map.axes())
+filled.contour(londim,latdim, eof1*100, nlevels=100, zlim=c(-4,4), color.palette=colour, plot.title=title(main="1st EOF (CCSM4 Mid Holocene)", font=2, lwd=10), plot.axes={maps::map(database="world2Hires", interior=T, add=T, lwd=3)},mar=map.axes())
 
 dev.off()
 
@@ -190,6 +200,13 @@ dev.off()
 
 
 
+##Borneo maps
+#EOF
+png(filename="IndoEOF1.png", width=300,height=200,units="mm",res=100) 
+
+filled.contour(londim,latdim, eof1*100, nlevels=100, ylim=c(-20,20), xlim=c(80,150),zlim=c(-4,4), color.palette=colour, plot.title=title(main="1st EOF (CCSM4 Historical)", font=2, lwd=10), plot.axes={maps::map(database="world2Hires", interior=T, add=T, lwd=3)},mar=map.axes())
+
+dev.off()
 
 
 

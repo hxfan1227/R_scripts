@@ -6,17 +6,17 @@
 
 ####parameters
 set<-	3	##if dataset is too large, this breaks it into n sets along lon. 
-n<-3		##number of the set being calculated. 
+n<-1		##number of the set being calculated. 
 
-data<-	"CCSM4_pr_piC_clim3.nc"		##netCDF filename (in quotation marks!) to extract data from/write data to
-anomvar<-"anomaly3"		##anomaly variable used
+data<-	"CCSM4_pr_mh_clim1.nc"		##netCDF filename (in quotation marks!) to extract data from/write data to
+anomvar<-"anomaly1"		##anomaly variable used
 
 nc<-open.ncdf(data, write=T)
-londim<-nc$dim$lon3		##lon dimension (change lon[n])
+londim<-nc$dim$lon1		##lon dimension (change lon[n])
 close.ncdf(nc)
 
 meanvar<- "annual_mean"		##new variable name, suggested format "xxx_mean" where xxx are months/seasons 
-varlong<-"Annual Mean Precipitation 250-1300"		##new variable long name, suggested format "xxx Mean Precipitation 250-1300"
+varlong<-"Annual Mean Precipitation 1850-2005"		##new variable long name, suggested format "xxx Mean Precipitation 250-1300"
 units<-"mm/day" 		##variable units
 
 mm<-	12	##number of months retained
@@ -53,12 +53,17 @@ anom<-get.var.ncdf(nc,anomvar,start=c(1,1,1),count=c(-1,-1,-1)) ##data anomaly1[
 
 close.ncdf(nc)
 
+
 ##label the time dimension to be able to select required months
 yr<-gl(12, 1, time,labels=c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")) #month levels
 ##make nc.1 into matrix[loc,time]
 dim(anom)<-c(lon*lat,time)
 ##append column names (months) to dataset matrix
 colnames(anom)<-yr
+
+
+
+
 
 
 # 3. ####### make months selection (if any)
@@ -90,8 +95,15 @@ colnames(anom)<-yr
 	#extract cols of wanted months
 	anom<-anom[,colnames(anom) %in% extract]
 
+
+
+
+
+
+
 ##restore dataset dimensions
 dim(anom)<-c(lon,lat,yy*mm)
+
 
 # 4. ############ take mean
 ##create one level for each year

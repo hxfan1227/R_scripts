@@ -2,10 +2,10 @@
 
 
 ###section 1
-data<-	"pr_Amon_CCSM4_piControl_r1i1p1_080001-130012.nc" ##name of dataset to be used
+data<-	"pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc" ##name of dataset to be used
 ###section 2
-varname<- "clim800_1300"
-longname<-"Climatology 800-1300"
+varname<- "climatology2"
+longname<-"Climatology"
 
 
 var<-	"pr"		##name of variable extracted
@@ -19,8 +19,9 @@ n<- 2			##section being used
 x.min<- 97		##start lon
 x.max<-	192		##end lon
 	#for lon 288: 0-96,97-192, 193-288
+totaltime<-3612		##full dataset time length (all time sets)
 
-ncname<-"CCSM4_pr_piC_clim2.nc"
+ncname<-"CCSM4_pr_mh_clim2.nc"
 units<- "mm/day"
 
 
@@ -64,7 +65,7 @@ clim[i,j,]<-vaggregate(var[i,j,],mm,mean,na.rm=T)
 ##Define dimensions
 x <- dim.def.ncdf( "lon2", "degrees_east", nc$dim$lon$vals[x.min:x.max])
 y <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[lat.min:lat.max])
-t <- dim.def.ncdf( "time", "timesteps", 1:12612,unlim=TRUE)
+t <- dim.def.ncdf( "time", "timesteps", 1:totaltime,unlim=TRUE)
 
 ##define variables
 climvar<-var.def.ncdf(varname,units,list(x,y,t),NA,longname=longname)
