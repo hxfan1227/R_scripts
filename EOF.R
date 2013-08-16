@@ -22,8 +22,9 @@ eofnc<-	"CCSM4_pr_piC_annualmeanEOF.nc"		##new netCDF for EOF analysis
 eof1long<-"EOF1 250-1300"		##new variable long name, suggested format 
 eof2long<-"EOF2 250-1300"		##new variable long name, suggested format
 eof3long<-"EOF3 250-1300"		##new variable long name, suggested format
-file<- "CCSM4_pr_piC_EOF.csv"		##where to store output 
+eoffile<- "CCSM4_pr_piC_EOF.csv"	##where to store EOF/PC output 
 	## use"[model]_[variable]_[run]_[meantype]EOF.csv"
+varfile<-"CCSM4_pr_piC_var.csv"		##where to store var/corr output
 
 
 ######## Create new netCDF file for full means and EOFs 
@@ -96,58 +97,49 @@ B<-eig$vectors #eigenvectors B
 D<-t(nc)%*%B #proportional EOFs
 eof<-sweep(D, 2, sqrt(colSums(D^2)), FUN="/") #normalise EOFs
 
-#write first 10 EOFs to .csv file
-write.table(eof[,1:10],file)
-
-##variance explained by each EOF
-variance<-diag(lam)/tr(lam) 
-variance[1:10]*100 #variance % for first 10 EOFs
-
-#write variance to .csv file
-write.table(variance[1:10],file,append=T,col.names="Variance")
+#write first 10 EOFs to .csv eoffile
+write.table(eof[,1:10],eoffile,col.names=list("EOF1", "EOF2","EOF3","EOF4","EOF5","EOF6","EOF7","EOF8","EOF9","EOF10"))
 
 ##EOF1
 eof1<-eof[,1] #1st EOF
 pc1<-nc%*%eof1 #PC1
 corr1<-cor(pc1,nc,method="spearman") #correlation1
-#write PC1 and correlation1 to .csv file
-write.table(pc1,file,append=T,col.names="PC1")
-#########################################################15/8
-
-##command below doesn't work... invalid col.names specification???
-
-
-write.table(corr1,file,append=T,col.names="Correlation1")
-
 dim(corr1)<-c(lon,lat) 
 varexp1<-(corr1^2)*100
 
 ##EOF2
-eof2<-eof[,2] #1st EOF
-pc2<-nc%*%eof2 #PC1
-corr2<-cor(pc2,nc,method="spearman") #correlation1
-#write PC2 and correlation2 to .csv file
-write.table(pc2,file,append=T,col.names="PC2")
-write.table(corr2,file,append=T,col.names="Correlation2")
-
+eof2<-eof[,2] #2nd EOF
+pc2<-nc%*%eof2 #PC2
+corr2<-cor(pc2,nc,method="spearman") #correlation2
 dim(corr2)<-c(lon,lat) 
 varexp2<-(corr2^2)*100
 
 ##EOF3
-eof3<-eof[,3] #1st EOF
-pc3<-nc%*%eof3 #PC1
-corr3<-cor(pc3,nc,method="spearman") #correlation1
-#write PC3 and correlation3 to .csv file
-write.table(pc3,file,append=T,rownames="PC3")
-write.table(corr3,file,append=T,rownames="Correlation3")
-
+eof3<-eof[,3] #3rd EOF
+pc3<-nc%*%eof3 #PC3
+corr3<-cor(pc3,nc,method="spearman") #correlation3
 dim(corr3)<-c(lon,lat) 
 varexp3<-(corr3^2)*100
 
+##combine PCs into matrix
+PC<-abind(pc1,pc2,pc3,along=2)
+#write PC to .csv eoffile
+write.table(PC,eoffile,append=T,col.names=list("PC1","PC2","PC3"))
 
+##variance explained by each EOF
+variance<-diag(lam)/tr(lam) 
+variance[1:10]*100 #variance % for first 10 EOFs
 
+#write variance to .csv varfile
+write.table(variance[1:10],varfile,col.names="Variance")
 
+##combine correlations into matrix
+correlation<-abind(corr1,corr2,corr3,along=2)
+#define colnames (latitudes)
+cols<-gl(3,lat,labels=list("Correlation1","Correlation2","Correlation3"))
 
+#write correlation to .csv varfile
+write.table(correlation,varfile,append=T,col.names=cols)
 
 
 
