@@ -21,7 +21,6 @@ meanvar<- "annual_mean"		##new variable name, suggested format "xxx_mean" where 
 varlong<-"Annual Mean Precipitation 1850-2005"		##new variable long name, suggested format "xxx Mean Precipitation 250-1300"
 units<-"mm/day" 
 
-mm<-	12	##number of months retained
 start<- 1	##first month to remove/select
 end<-	12	##last month to remove/select
 	#annual = 1:12
@@ -29,7 +28,7 @@ end<-	12	##last month to remove/select
 	#summer MJJAS = 5:9 (select)
 
 
-anommean<-function(data,anomvar,winter=FALSE,meanvar,varlong, stmm,endmm)
+anommean<-function(data,anomvar,winter=FALSE,meanvar,varlong, start,end)
 {
 # 1. ########define new variable
 nc<-open.ncdf(data, write=T)
@@ -116,16 +115,12 @@ ncmean<-array(0,dim=c(lon,lat,yy))
 		}
 	}
 
-
-
 # 5. ###########writing to NetCDF
 nc<-open.ncdf(data, write=T)
 ##put data into variable
 put.var.ncdf(nc,meanvar,ncmean, start=c(1,1,1),count=c(-1,-1,yy)) 
-
-
 close.ncdf(nc)
-
+}
 
 
 
