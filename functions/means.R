@@ -14,11 +14,12 @@ anomvar<-"anomaly1"		##anomaly variable used
 nc<-open.ncdf(data, write=T)
 londim<-nc$dim$lon1		##lon dimension (change lon[n])
 close.ncdf(nc)
+		##variable units
 
 winter<- FALSE			##boolean; TRUE if extracting winter months (or other months NOT consecutive within a year)
 meanvar<- "annual_mean"		##new variable name, suggested format "xxx_mean" where xxx are months/seasons 
 varlong<-"Annual Mean Precipitation 1850-2005"		##new variable long name, suggested format "xxx Mean Precipitation 250-1300"
-units<-"mm/day" 		##variable units
+units<-"mm/day" 
 
 mm<-	12	##number of months retained
 start<- 1	##first month to remove/select
@@ -28,8 +29,45 @@ end<-	12	##last month to remove/select
 	#summer MJJAS = 5:9 (select)
 
 
-######## Creating new netCDF variable ###################
+anommean<-function(data,anomvar,winter=FALSE,meanvar,varlong, stmm,endmm){
 # 1. ########define new variable
+nc<-open.ncdf(data, write=T)
+##define variable
+newmean<-var.def.ncdf(meanvar, units, list(nc$dim$lon,nc$dim$lat,nc$dim$time),missval=NA, 
+longname=varlong)  
+##add to netcdf file
+nc<-var.add.ncdf(nc,newmean) 
+close.ncdf(nc)
+
+###### Calculating mean #########################
+# 2. ########get data
+nc<-open.ncdf(data, write=T) 
+lon<-nc$dim$lon$len ##number of lons
+lat<-nc$dim$lat$len ##number of lats
+time<-nc$dim$time$len ##number of timesteps
+yy<-time/12 ## number of years 
+
+##retrieve data
+anom<-get.var.ncdf(nc,anomvar,start=c(1,1,1),count=c(-1,-1,-1)) ##data anomaly1[lon,lat,time]
+close.ncdf(nc)
+
+
+##label the time dimension to be able to select required months
+yr<-gl(12, 1, time,labels=c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")) #month levels
+##make nc.1 into matrix[loc,time]
+dim(anom)<-c(lon*lat,time)
+##append column names (months) to dataset matrix
+colnames(anom)<-yr
+
+}
+
+
+
+
+
+
+######## Creating new netCDF variable ###################
+
 nc<-open.ncdf(data, write=T)
 ##define variable
 newmean<-var.def.ncdf(meanvar, units, list(londim,nc$dim$lat,nc$dim$time),missval=NA, 
