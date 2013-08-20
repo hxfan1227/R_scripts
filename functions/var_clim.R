@@ -2,7 +2,7 @@
 #This calculates climatologies for the first longitudinal section. Repeat this for all time sections. 
 
 
-function(
+function(vb,ncname,data,varname,units="mm/day"
 
 
 vb<-	"pr"		##name of variable extracted

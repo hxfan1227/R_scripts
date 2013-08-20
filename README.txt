@@ -17,3 +17,7 @@ This combines all climatologies from the previous script to create a final clima
 5. EOF.R
 	This script concatenates means for all lons and calculates the EOFs. EOFs, variances, PCs and correlations for the first 3 EOFs get saved in .csv files. It also produces maps and figures which get saved as .png files. 
 
+
+FUNCTIONS:
+
+means: anommean

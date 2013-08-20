@@ -1,35 +1,4 @@
-############################# CALCULATING MEANS	####################
-# you can calculate means for selected months using the code below. Annual means obviously require all months, whereas seasonal means are derived from certain months only. 
-#instructions for specific adaptations are given along the way. Generally tab spaces indicate where things need to be completed 
-# Repeat for all lon sections!!
-
-
-####parameters
-set<-	3	##if dataset is too large, this breaks it into n sets along lon. 
-n<-1		##number of the set being calculated. 
-
-data<-	"CCSM4_pr_mh_clim1.nc"		##netCDF filename (in quotation marks!) to extract data from/write data to
-anomvar<-"anomaly1"		##anomaly variable used
-
-nc<-open.ncdf(data, write=T)
-londim<-nc$dim$lon1		##lon dimension (change lon[n])
-close.ncdf(nc)
-		##variable units
-
-winter<- FALSE			##boolean; TRUE if extracting winter months (or other months NOT consecutive within a year)
-meanvar<- "annual_mean"		##new variable name, suggested format "xxx_mean" where xxx are months/seasons 
-varlong<-"Annual Mean Precipitation 1850-2005"		##new variable long name, suggested format "xxx Mean Precipitation 250-1300"
-units<-"mm/day" 
-
-mm<-	12	##number of months retained
-start<- 1	##first month to remove/select
-end<-	12	##last month to remove/select
-	#annual = 1:12
-	#winter NDJFM = 4:10 (remove)
-	#summer MJJAS = 5:9 (select)
-
-
-anommean<-function(data,anomvar,winter=FALSE,meanvar,varlong, stmm,endmm)
+anommean<-function(data,anomvar,winter=FALSE,meanvar,varlong, start,end)
 {
 # 1. ########define new variable
 nc<-open.ncdf(data, write=T)
@@ -116,18 +85,11 @@ ncmean<-array(0,dim=c(lon,lat,yy))
 		}
 	}
 
-
-
 # 5. ###########writing to NetCDF
 nc<-open.ncdf(data, write=T)
 ##put data into variable
 put.var.ncdf(nc,meanvar,ncmean, start=c(1,1,1),count=c(-1,-1,yy)) 
-
-
 close.ncdf(nc)
-
-
-
-
+}
 
 
