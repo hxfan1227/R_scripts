@@ -22,7 +22,7 @@ library(R.oo) #masks getDescription, getTitle, attach, getClasses, getMethods, a
 library(R.utils) #masks insert, timestamp, cat, commandArgs, getOption, inherits, isOpen, parse, warnings
 library(plyr) #needed for vaggregate
 library(reshape) #possibly needed??? masks rename, round_any
-
+library(ncdf4)
 
 
 
