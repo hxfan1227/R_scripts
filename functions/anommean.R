@@ -1,4 +1,18 @@
-anommean<-function(data,anomvar,winter=FALSE,meanvar,varlong, start,end)
+####parameters
+# data		netCDF filename (in quotation marks!) to extract data from/write data to
+# anomvar	anomaly variable used. Default "anomaly"
+# winter	boolean. If TRUE, extracted months are NOT consecutive within a year(like in winter) and those in between will be removed.
+# meanvar	new variable name, suggested format "xxx_mean" where xxx are months/seasons 
+# varlong	new variable long name, suggested format "xxx Mean Precipitation [date/period]"
+# units		variable units. Default "mm/day"
+# start		first month to remove or select
+# end		last month to remove or select
+		#annual = 1:12
+		#winter NDJFM = 4:10 (remove)
+		#summer MJJAS = 5:9 (select)
+
+
+anommean<-function(data,anomvar="anomaly",winter=FALSE,meanvar,varlong,units="mm/day"  start,end)
 {
 # 1. ########define new variable
 nc<-open.ncdf(data, write=T)
