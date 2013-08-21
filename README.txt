@@ -18,7 +18,11 @@ This combines all climatologies from the previous script to create a final clima
 	This script concatenates means for all lons and calculates the EOFs. EOFs, variances, PCs and correlations for the first 3 EOFs get saved in .csv files. It also produces maps and figures which get saved as .png files. 
 
 
-FUNCTIONS:
 
-means: anommean
-bla bla
+####### FUNCTIONS ####################################
+
+4. MEANS: anommean
+	Inputs: data,anomvar,winter=FALSE,meanvar,varlong, start,end
+	Outputs: variable meanvar
+
+
