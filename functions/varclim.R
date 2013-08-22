@@ -1,41 +1,13 @@
-##calculating tropical climatological mean SECTION 1 ####################################
-#This calculates climatologies for the first longitudinal section. Repeat this for all time sections. 
-
-
-function(vb,ncname,data,varname,units="mm/day"
-
-
-vb<-	"pr"		##name of variable extracted
-conv<-86400		##unit conversion (1 if NA)
-	#precipitation mm/day: 86400
-
-#Break dataset into spatial (lon) sections
-set<- 3			##number of sections
-n<- 1			##section being used
-
-x.min<- 0		##start lon
-x.max<-	96		##end lon
-	#for lon 288: 0-96,97-192, 193-288
-totaltime<-3612		##full dataset time length (all time sets)
-
-###section 2
-ncname<-"CCSM4_pr_mh_clim1.nc"
-
-data<-	"pr_Amon_CCSM4_midHolocene_r1i1p1_100001-130012.nc" ##name of dataset to be used
-varname<- "climatology1"
-units<- "mm/day"
-longname<-"Climatology"
-
-### parameters ########
-#vb		Character string; climatological variable to analyse (as in raw dataset filenames)
-#model		Character string; model that data is taken from (as in raw dataset filenames)
-#period		Character string; PMIP3 timeslice (pic,h,1k,mh) or empirical data range (yy-yy)
-#dx		Numerical value; dataset LON slice
-#dy		Numerical value; dataset LAT slice
+##### parameters
+# vb		Character string; climatological variable to analyse (as in raw dataset filenames)
+# model		Character string; model that data is taken from (as in raw dataset filenames)
+# period		Character string; PMIP3 timeslice (pic,h,1k,mh) or other data range (yy-yy)
+# x		Numerical value; dataset LON slice
+# y		Numerical value; dataset LAT slice
 
 
 
-varclim<-function(vb,model,period,dx,dy)
+varclim<-function(vb,model,period,x,y,units)
 {
 	##Get filenames of all data timesets within a model timeslice
 	filename<-paste(vb,"Amon",model,"*",sep="_") #creates search string "[var]_Amon_[model]_*"
@@ -50,7 +22,7 @@ varclim<-function(vb,model,period,dx,dy)
 		yy<-time/12
 
 		#Define dimensions
-		#Take lon,lat values for slice [dx,dy]
+		#Take lon,lat values for slice [x,y]
 		londim <- dim.def.ncdf( "lon", "degrees_east", nc$dim$lon$vals[(1+((x-1)*lon)):(x*lon)]) 
 		latdim <- dim.def.ncdf( "lat", "degrees_north", nc$dim$lat$vals[(1+((y-1)*lat)):(y*lat)])
 		#Time is unlim so doesn't matter if there are multiple timesets
@@ -72,15 +44,11 @@ varclim<-function(vb,model,period,dx,dy)
 	summer<-var.def.ncdf(summer,units,list(londim,latdim,timedim),NA,longname=summer)
 
 	##create netCDF file
-	ncname<-paste(model,vb,period,".nc",sep=".") #gives "model.variable.timeslice.nc"
+	ncname<-paste(model,vb,period,x,y,".nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
 	nc<-create.ncdf(ncname, climvar,anomvar,annual,winter,summer)
 	close.ncdf(nc)
 
 	#### 2. Get variable data ######################
-	#get all timesets filenames 
-	filename<-paste(vb,"Amon",model,"*",sep="_") #creates search string "[var]_Amon_[model]_*"
-	files<-Sys.glob(filename) #vector with names of all raw datafiles
-
 	if (length(files)==1) #if there is only 1 raw data timeset
 	{
 		nc<-open.ncdf(data,write=T)
@@ -120,8 +88,15 @@ varclim<-function(vb,model,period,dx,dy)
 		{
 			nc<-open.ncdf(files[f],write=T)
 				var<-get.var.ncdf(nc, vb, start=c(1+((x-1)*lon),1+((y-1)*lat),1), count=c(lon,lat,-1))
+			if (vb=="pr")
+			{
 				#convert to mm/day
-				var<-var*conv
+				var<-var*86400
+			}
+			else
+			{
+				var<-var #can be changed if it's necessary for SST to convert...?
+			}
 			close.ncdf(nc)
 
 			####### 3. Calculate climatology ############
