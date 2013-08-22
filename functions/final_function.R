@@ -18,9 +18,9 @@ eof[X,Y]
 
 
 
-# varclim[x,y]: varclim<-function(vb,model,period,dx,dy)
+# varclim[x,y]: varclim<-function(vb,model,period,x,y,units)
 1. retrieves raw data filenames
-2. creates netCDF file [dx,dy] with variables 
+2. creates netCDF file [x,y] with variables 
 	clim
 	anom
 	annual mean

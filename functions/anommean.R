@@ -1,10 +1,5 @@
 ##### parameters
-# ncname	Character string; NetCDF filename extract data from/write data to
-# anomvar	Anomaly variable used. Default "anomaly"
 # winter	Boolean. If TRUE, extracted months are NOT consecutive within a year(like in winter) and those in between will be removed.
-# meanvar	new variable name, suggested format "xxx_mean" where xxx are months/seasons 
-# varlong	new variable long name, suggested format "xxx Mean Precipitation [date/period]"
-# units		variable units. Default "mm/day"
 # start		first month to remove or select
 # end		last month to remove or select
 		#annual = 1:12
@@ -12,47 +7,41 @@
 		#summer MJJAS = 5:9 (select)
 
 
-anommean<-function(ncname,anomvar="anomaly",winter=FALSE,meanvar,varlong,units="mm/day"  start,end)
+anommean<-function(winter=FALSE, start,end)
 {
-	# 1. ########define new variable
-	nc<-open.ncdf(ncname, write=T)
-		##define variable
-		newmean<-var.def.ncdf(meanvar, units, list(nc$dim$lon,nc$dim$lat,nc$dim$time),missval=NA, 
-		longname=varlong)  
-		##add to netcdf file
-		nc<-var.add.ncdf(nc,newmean) 
-	close.ncdf(nc)
-
-	###### Calculating mean #########################
-	# 2. ########get data
+	ncname<-paste(model,vb,period,x,y,".nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
+	## 1. Get anomalies and dimensions ############
 	nc<-open.ncdf(ncname, write=T) 
+		#get dimensions	for [x,y]
 		lon<-nc$dim$lon$len ##number of lons
 		lat<-nc$dim$lat$len ##number of lats
 		time<-nc$dim$time$len ##number of timesteps
 		yy<-time/12 ## number of years 
-
-		##retrieve data
-		anom<-get.var.ncdf(nc,anomvar,start=c(1,1,1),count=c(-1,-1,-1)) ##data anomaly1[lon,lat,time]
-	close.ncdf(nc)
-
-	##label the time dimension to be able to select required months
+		#retrieve anomaly data
+		anomvar<-paste("anomaly", x,y, sep = ".") #"anomaly.x.y"
+		anom<-get.var.ncdf(nc,anomvar,count=c(-1,-1,-1)) 	close.ncdf(nc)
+	## 2. label the time dimension with months #########
 	yr<-gl(12, 1, time,labels=c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")) #month levels
-	##make nc.1 into matrix[loc,time]
+	#make anom into matrix[loc,time]
 	dim(anom)<-c(lon*lat,time)
-	##append column names (months) to dataset matrix
+	#append column names (months) to dataset matrix
 	colnames(anom)<-yr
 
-	######## Creating new netCDF variable ###################
-	nc<-open.ncdf(ncname, write=T)
-		##define variable
-		newmean<-var.def.ncdf(meanvar, units, list(nc$dim$lon,nc$dim$lat,nc$dim$time),missval=NA, 
-		longname=varlong)  
-		##add to netcdf file
-		nc<-var.add.ncdf(nc,newmean) 
-	close.ncdf(nc)
+	# 3. Make months selection ###########
 
-	# 3. ####### make months selection
-	if (winter==TRUE) ####a) WINTER: selecting months to remove
+nc<- open.ncdf(ncname, write=T) 
+	
+
+
+
+
+
+
+
+
+	
+
+if (winter==TRUE) ####a) WINTER: selecting months to remove
 	{	
 		remove<-colnames(anom)[start:end] 
 		#remove cols of unwanted months
