@@ -32,12 +32,9 @@ varanom<-function(vb,model,period,x,y)
 			yy<-time/12
 			var<-get.var.ncdf(nc, vb, start=c(1+((x-1)*lon),1+((y-1)*lat),1), count=c(lon,lat,-1))
 		close.ncdf(nc)
-		if (vb=="pr")
-		{
+		if (vb=="pr") {
 			var<-var*86400 #convert to mm/day
-		}
-		else
-		{
+		} else {
 			var<-var #can be changed if necessary for SST
 		}
 

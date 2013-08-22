@@ -49,19 +49,15 @@ varclim<-function(vb,model,period,x,y,units)
 	close.ncdf(nc)
 
 	#### 2. Get variable data ######################
-	if (length(files)==1) #if there is only 1 raw data timeset
-	{
+	if (length(files)==1) { #if there is only 1 raw data timeset
 		nc<-open.ncdf(data,write=T)
-			var<-get.var.ncdf(nc, vb, start=c(1+((x-1)*lon),1+((y-1)*lat),1), count=c(lon,lat,-1))
-			if (vb=="pr")
-			{
-				#convert to mm/day
-				var<-var*86400
-			}
-			else
-			{
-				var<-var #can be changed if it's necessary for SST to convert...?
-			}
+		var<-get.var.ncdf(nc, vb, start=c(1+((x-1)*lon),1+((y-1)*lat),1), count=c(lon,lat,-1))
+		if (vb=="pr") {
+			#convert to mm/day
+			var<-var*86400
+		} else {
+			var<-var #can be changed if it's necessary for SST to convert...?
+		}
 		close.ncdf(nc)
 
 		####### 3. Calculate climatology ############
@@ -81,20 +77,15 @@ varclim<-function(vb,model,period,x,y,units)
 		nc<-open.ncdf(ncname,write=T)
 			put.var.ncdf(nc,climvar,clim,start=c(1,1,1),count=c(-1,-1,12))
 		close.ncdf(nc)
-	}
-	else #if there are more than 1 raw data timesets that need to be combined to make a final climatology
-	{
+	} else { #if there are more than 1 raw data timesets that need to be combined to make a final climatology
 		for (f in 1:length(files))
 		{
 			nc<-open.ncdf(files[f],write=T)
 				var<-get.var.ncdf(nc, vb, start=c(1+((x-1)*lon),1+((y-1)*lat),1), count=c(lon,lat,-1))
-			if (vb=="pr")
-			{
+			if (vb=="pr") {
 				#convert to mm/day
 				var<-var*86400
-			}
-			else
-			{
+			} else {
 				var<-var #can be changed if it's necessary for SST to convert...?
 			}
 			close.ncdf(nc)
