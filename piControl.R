@@ -2,6 +2,8 @@
 #setup
 #all of these must be done for the rest to work properly
 cd /home/lmkh201/Documents/R/model_data/pr/piControl/GISS-E2-R/r1i1p1
+
+
 R
 
 .libPaths(new="/home/lmkh201/Documents/R/R_packages")
@@ -24,7 +26,7 @@ library(plyr) #needed for vaggregate
 library(reshape) #possibly needed??? masks rename, round_any
 library(ncdf4)
 
-
+source("/home/lmkh201/Documents/R/R_scripts/functions/MEANS.R")
 
 
 

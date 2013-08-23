@@ -20,7 +20,7 @@ eof[X,Y]
 
 
 vb<-"pr"
-model<-"MIROC-ESM"
+model<-"GISS-E2-R"
 period<-"piC"
 dx<-4
 dy<-2
@@ -33,7 +33,9 @@ source("/home/lmkh201/Documents/R/R_scripts/functions/varanom.R")
 source("/home/lmkh201/Documents/R/R_scripts/functions/anommean.R")
 
 varclim(vb=vb,model=model,period=period,x=x,y=y,units=units)
+
 varanom(vb=vb,model=model,period=period,x=x,y=y)
+
 anommean(vb=vb,model=model,period=period,x=x,y=y)
 
 

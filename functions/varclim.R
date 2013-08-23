@@ -7,7 +7,7 @@
 
 
 
-varclim<-function(vb,model,period,x,y,units)
+varclim<-function(x,y)
 {
 	##Get filenames of all data timesets within a model timeslice
 	filename<-paste(vb,"Amon",model,"*",sep="_") #creates search string "[var]_Amon_[model]_*"

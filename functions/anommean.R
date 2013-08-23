@@ -2,7 +2,7 @@
 		
 
 
-anommean<-function(model,vb,period,x,y)
+anommean<-function(x,y)
 {
 	ncname<-paste(model,vb,period,x,y,"nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
 	## 1. Get anomalies and dimensions ############
