@@ -30,7 +30,9 @@ varanom<-function(vb,model,period,x,y)
 		nc<-open.ncdf(data,write=T)
 			time<-nc$dim$time$len
 			yy<-time/12
-			start<-min(nc$dim$time$vals) #timeset absolute beginning
+			yrdays<-(nc$dim$time$vals[time]-start)/yy
+
+start<-min(nc$dim$time$vals) #timeset absolute beginning
 			var<-get.var.ncdf(nc, vb, start=c(1+((x-1)*lon),1+((y-1)*lat),1), count=c(lon,lat,-1))
 		close.ncdf(nc)
 		if (vb=="pr") {
@@ -49,14 +51,14 @@ varanom<-function(vb,model,period,x,y)
 		#match variable dimensions
 		dim(clim)<-dim(var)
 		##remove climatological mean from data to get anomaly
-		var<-var-clim
+		anom<-var-clim
 
 		#####2. Add to netCDF file #####################
 		#add data to variable
 		nc<-open.ncdf(ncname,write=T)
 			anomvar<-paste("anomaly", x,y, sep = ".") #"anomaly.x.y"
 			st<-(start-run)+1 #timeset relative beginning
-			put.var.ncdf(nc,anomvar,var, start=c(1,1,st), count=c(-1,-1,time))
+			put.var.ncdf(nc,anomvar,anom, start=c(1,1,st), count=c(-1,-1,length(anom[1,1,])))
 		close.ncdf(nc)
 	}
 }
