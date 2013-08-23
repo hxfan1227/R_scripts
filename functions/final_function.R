@@ -7,8 +7,13 @@ function(dx=4,dy=2) ##dx=4,dy=2 should work for all model dataset (checked in pi
 	{
 		for (y in 1:dy)
 		{
+			print(paste("Starting varclim",x,y,sep="."))			
 			varclim[x,y]
+
+			print(paste("Starting varanom",x,y,sep="."))	
 			varanom[x,y]
+
+			print(paste("Starting anommean",x,y,sep="."))	
 			anommean[x,y]
 		}
 	}
@@ -20,12 +25,10 @@ eof[X,Y]
 
 
 vb<-"pr"
-model<-"GISS-E2-R"
+model<-"MIROC-ESM"
 period<-"piC"
 dx<-4
 dy<-2
-x<-1
-y<-1
 units<-"mm/day"
 
 source("/home/lmkh201/Documents/R/R_scripts/functions/varclim.R")

@@ -2,10 +2,10 @@
 		
 
 
-anommean<-function(x,y)
+anommean<-function(vb=vb,model=model,period=period,x=x,y=y)
 {
 	ncname<-paste(model,vb,period,x,y,"nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
-	## 1. Get anomalies and dimensions ############
+	print("1. Get anomalies and dimensions")
 	nc<-open.ncdf(ncname, write=T) 
 		#get dimensions	for [x,y]
 		lon<-nc$dim$lon$len ##number of lons
@@ -16,14 +16,14 @@ anommean<-function(x,y)
 		anomvar<-paste("anomaly", x,y, sep = ".") #"anomaly.x.y"
 		anom<-get.var.ncdf(nc,anomvar,count=c(-1,-1,-1)) 	
 	close.ncdf(nc)
-	## 2. label the time dimension with months #########
+	print("2. label the time dimension with months")
 	yr<-gl(12, 1, time,labels=c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec")) #month levels
 	#make anom into matrix[loc,time]
 	dim(anom)<-c(lon*lat,time)
 	#append column names (months) to dataset matrix
 	colnames(anom)<-yr
 
-	# 3. Make months selection ###########
+	print("3. Make months selection")
 	nc<- open.ncdf(ncname, write=T) 
 		#get mean variable names
 		grx<-glob2rx("*mean*")
@@ -45,7 +45,7 @@ anommean<-function(x,y)
 			mm<-12
 			dim(ann)<-c(lon,lat,yy*mm)
 
-			# 4. ############ take mean
+			print("4.Take the annual mean")
 			#create one level for each year
 			y<-gl(yy,mm)
 			#loop taking mean for each [lat,lon] grid 
@@ -78,7 +78,7 @@ anommean<-function(x,y)
 			##restore dataset dimensions
 			dim(wint)<-c(lon,lat,(yys*mm))
 
-			# 4. ############ take mean
+			print("4.Take the winter mean")
 			#create one level for each year
 			mm<-length(5:9)
 			y<-gl(yy,mm)
@@ -108,7 +108,7 @@ anommean<-function(x,y)
 			mm<-length(5:9)
 			dim(summ)<-c(lon,lat,(yy*mm))
 
-			# 4. ############ take mean
+			print("4.Take the summer mean")
 			#create one level for each year
 			y<-gl(yy,mm)
 			#loop taking mean for each [lat,lon] grid 
@@ -129,7 +129,7 @@ anommean<-function(x,y)
 		close.ncdf(nc)
 		}
 	}
-
+return()
 }
 
 

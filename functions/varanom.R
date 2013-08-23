@@ -6,7 +6,7 @@
 # y		Numerical value; dataset LAT slice
 
 
-varanom<-function(x,y)
+varanom<-function(vb=vb,model=model,period=period,x=x,y=y)
 {
 	#get dimensions	for [x,y]
 	ncname<-paste(model,vb,period,x,y,"nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
@@ -15,7 +15,7 @@ varanom<-function(x,y)
 		lat<-nc$dim$lat$len
 	close.ncdf(nc)
 
-	##Get filenames of all data timesets within a model timeslice
+	print("Get filenames of all data timesets within the model timeslice")
 	filename<-paste(vb,"Amon",model,"*",sep="_") #creates search string "[var]_Amon_[model]_*"
 	files<-Sys.glob(filename) #vector with names of all raw datafiles
 		nxt<-1
@@ -23,7 +23,8 @@ varanom<-function(x,y)
 	for (f in 1:length(files))
 	{
 		data<-files[f] #raw datafile
-		### 1. Get variable data ###########
+
+		print("1. Get variable data")
 		nc<-open.ncdf(data,write=T)
 			time<-nc$dim$time$len
 			yy<-time/12
@@ -37,7 +38,7 @@ varanom<-function(x,y)
 			var<-var #can be changed if necessary for SST
 		}
 
-		##retrieve climatology
+		print("Retrieve climatology")
 		nc<-open.ncdf(ncname)
 			climvar<-paste("climatology",x,y,sep=".")
 			clim<-get.var.ncdf(nc,climvar,count=c(-1,-1,12))
@@ -46,10 +47,10 @@ varanom<-function(x,y)
 		clim<-replicate(yy,abind(clim,along=3))
 		#match variable dimensions
 		dim(clim)<-dim(var)
-		##remove climatological mean from data to get anomaly
+		print("Remove climatological mean from data to get anomaly")
 		anom<-var-clim
 
-		#####2. Add to netCDF file #####################
+		print("2. Add to netCDF file")
 		#add data to variable
 		nc<-open.ncdf(ncname,write=T)
 			anomvar<-paste("anomaly", x,y, sep = ".") #"anomaly.x.y"
@@ -57,6 +58,7 @@ varanom<-function(x,y)
 			put.var.ncdf(nc,"time",st:(nxt-1),start=st,count=time)
 		close.ncdf(nc)
 	}
+return()
 }
 
 

@@ -29,6 +29,25 @@ library(ncdf4)
 source("/home/lmkh201/Documents/R/R_scripts/functions/MEANS.R")
 
 
+MEANS(vb="pr",model="MIROC-ESM",period="piC",dx=4,dy=2,units="mm/day")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ###PRE-INDUSTRIAL CONTROL
 ##calculate climatological mean
