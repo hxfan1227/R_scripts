@@ -1,7 +1,7 @@
 ######
 #setup
 #all of these must be done for the rest to work properly
-cd /home/lmkh201/Documents/R/model_data/pr/midHolocene/CCSM4/r1i1p1
+cd /home/lmkh201/Documents/R/model_data/pr/piControl/GISS-E2-R/r1i1p1
 R
 
 .libPaths(new="/home/lmkh201/Documents/R/R_packages")

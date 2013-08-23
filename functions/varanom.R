@@ -9,7 +9,7 @@
 varanom<-function(vb,model,period,x,y)
 {
 	#get dimensions	for [x,y]
-	ncname<-paste(model,vb,period,x,y,".nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
+	ncname<-paste(model,vb,period,x,y,"nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
 	nc<-open.ncdf(ncname)
 		lon<-nc$dim$lon$len
 		lat<-nc$dim$lat$len
@@ -19,7 +19,7 @@ varanom<-function(vb,model,period,x,y)
 	filename<-paste(vb,"Amon",model,"*",sep="_") #creates search string "[var]_Amon_[model]_*"
 	files<-Sys.glob(filename) #vector with names of all raw datafiles
 	data<-files[1]
-	open.ncdf(data)
+	nc<-open.ncdf(data)
 		run<-min(nc$dim$time$vals) #get absolute starting timepoint
 	close.ncdf(nc)
 
@@ -30,6 +30,7 @@ varanom<-function(vb,model,period,x,y)
 		nc<-open.ncdf(data,write=T)
 			time<-nc$dim$time$len
 			yy<-time/12
+			start<-min(nc$dim$time$vals) #timeset absolute beginning
 			var<-get.var.ncdf(nc, vb, start=c(1+((x-1)*lon),1+((y-1)*lat),1), count=c(lon,lat,-1))
 		close.ncdf(nc)
 		if (vb=="pr") {
@@ -54,7 +55,6 @@ varanom<-function(vb,model,period,x,y)
 		#add data to variable
 		nc<-open.ncdf(ncname,write=T)
 			anomvar<-paste("anomaly", x,y, sep = ".") #"anomaly.x.y"
-			start<-min(nc$dim$time$vals) #timeset absolute beginning
 			st<-(start-run)+1 #timeset relative beginning
 			put.var.ncdf(nc,anomvar,var, start=c(1,1,st), count=c(-1,-1,time))
 		close.ncdf(nc)

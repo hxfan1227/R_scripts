@@ -20,7 +20,7 @@ varclim<-function(vb,model,period,x,y,units)
 		lat<-nc$dim$lat$len/dy
 		time<-nc$dim$time$len
 		yy<-time/12
-
+		
 		#Define dimensions
 		#Take lon,lat values for slice [x,y]
 		londim <- dim.def.ncdf( "lon", "degrees_east", nc$dim$lon$vals[(1+((x-1)*lon)):(x*lon)]) 
@@ -44,8 +44,8 @@ varclim<-function(vb,model,period,x,y,units)
 	summer<-var.def.ncdf(summer,units,list(londim,latdim,timedim),NA,longname=summer)
 
 	##create netCDF file
-	ncname<-paste(model,vb,period,x,y,".nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
-	nc<-create.ncdf(ncname, climvar,anomvar,annual,winter,summer)
+	ncname<-paste(model,vb,period,x,y,"nc",sep=".") #gives "model.variable.timeslice.x.y.nc"
+	nc<-create.ncdf(ncname, list(climvar,anomvar,annual,winter,summer))
 	close.ncdf(nc)
 
 	#### 2. Get variable data ######################
@@ -106,7 +106,7 @@ varclim<-function(vb,model,period,x,y,units)
 			##add data to new netCDF file
 			nc<-open.ncdf(ncname,write=T) 
 				#add each timeset's clim onto time dimension
-				put.var.ncdf(nc,climvar,clim,start=c(1,1,(1+((f-1)*12),count=c(-1,-1,12)) 
+				put.var.ncdf(nc,climvar,clim,start=c(1,1,(1+((f-1)*12))),count=c(-1,-1,12)) 
 			close.ncdf(nc)
 		}
 		##compute final climatology
@@ -120,7 +120,7 @@ varclim<-function(vb,model,period,x,y,units)
 			#loop to put data in means array
 			for (f in 1:length(files))
 			{
-				means[,,,f]<-get.var.ncdf(nc,climvar,start=c(1,1,(1+((f-1)*12),count=c(-1,-1,12))
+				means[,,,f]<-get.var.ncdf(nc,climvar,start=c(1,1,(1+((f-1)*12))),count=c(-1,-1,12))
 			}
 			#take mean over all timesets (4th dimension)
 			for (i in 1:lon)
